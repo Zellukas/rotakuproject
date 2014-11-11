@@ -1,0 +1,76 @@
+//if(@policial) callfunc policial;
+
+function	script	policial	{
+
+	if(agepolicial == 3)
+	{
+		mes "[Prefeito]";
+		mes "Bom trabalho, "+strcharinfo(0)+"! Aproveite a sua recompensa.";
+		getitem 666,1;
+		agepolicial = 0;
+		policial_a = 0;
+		policial_f = 0;
+		close;
+	}
+	if(policial_a)
+	{
+		if(!policial_f)
+		{
+			mes "[Prefeito]";
+			mes "Você ainda não o prendeu!?";
+			close;
+		}
+		mes "[Prefeito]";
+		mes "Aqui está a sua recompensa!";
+		Zeny += 400000;
+		agepolicial = agepolicial + 1;
+		policial_a = 0;
+		policial_f = 0;
+		close;
+	}
+	mes "[Prefeito]";
+	mes "Preciso que você prenda um malfeitor.";
+	next;
+	mes "[Prefeito]";
+	mes "Procure pelo bandido na cidade e você receberá 400.000 rupias!";
+	policial_a = 1;
+	close;
+}
+
+prontera,156,185,3	script	Menino Maluquinho	69,1,1,{
+	
+	end;
+
+	OnTouch:
+		if(policial_a)
+		{
+			if(!policial_f)
+			{
+				unittalk getcharid(3),"Pare, seu ladrãozinho! Você está sendo preso em nome da lei!";
+				npcstop;
+				policial_f = 1;
+				.policial_f = 1;
+			}
+			end;
+		}
+		if(@robbed) end;
+		Zeny -= 10000;
+		npctalk "Perdeu, playboy!";
+		@robbed = 1;
+		end;
+	
+	OnInit:
+	getmapxy .map_npc$,.x_npc,.y_npc,1;
+	.minimal_distance = 10;
+	.interval = 5;
+	.step = 10;
+	npcspeed 100;
+	while(1) {
+		sleep .interval * 1000;
+		if(.policial_f) break;
+		getmapxy .map$,.x,.y,1,strnpcinfo(0);
+		while (checkcell(.map$,.npc_x = .x + rand(-.step,.step),.npc_y = .y + rand(-.step,.step),cell_chknopass));
+		npcwalkto .npc_x, .npc_y;
+	}
+	end;
+}
